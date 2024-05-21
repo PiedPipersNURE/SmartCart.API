@@ -1,4 +1,4 @@
-﻿namespace SmartCart.Client.Enums
+﻿namespace SmartCart.DataProvider.Enums
 {
     public enum Quantity
     {
