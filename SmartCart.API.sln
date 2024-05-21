@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartCart.Identity", "SmartCart.Identity\SmartCart.Identity.csproj", "{9EE353E9-BB70-4EB9-9830-B7461E7A9B1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCart.Client", "SmartCart.Client\SmartCart.Client.csproj", "{98977B0F-BC75-42FF-AB92-C98F780F138E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EE353E9-BB70-4EB9-9830-B7461E7A9B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EE353E9-BB70-4EB9-9830-B7461E7A9B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EE353E9-BB70-4EB9-9830-B7461E7A9B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EE353E9-BB70-4EB9-9830-B7461E7A9B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98977B0F-BC75-42FF-AB92-C98F780F138E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98977B0F-BC75-42FF-AB92-C98F780F138E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98977B0F-BC75-42FF-AB92-C98F780F138E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98977B0F-BC75-42FF-AB92-C98F780F138E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5FDBEBF-866E-4DD3-B463-83F0BA7890BB}
+	EndGlobalSection
+EndGlobal
