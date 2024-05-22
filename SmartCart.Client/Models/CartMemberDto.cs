@@ -1,9 +1,9 @@
-﻿namespace SmartCart.Client.Models.CartMember
+﻿namespace SmartCart.Client.Models
 {
     public class CartMemberDto
     {
         public Guid CartMemberID { get; set; }
         public Guid CartID { get; set; }
-        public string MemberID { get; set; }
+        public Guid MemberID { get; set; }
     }
 }
