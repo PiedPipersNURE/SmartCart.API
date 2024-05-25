@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartCart.DataProvider.Models;
 using SmartCart.DataProvider.Repositories;
 
 namespace SmartCart.DataProvider.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
