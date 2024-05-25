@@ -5,7 +5,6 @@ using SmartCart.DataProvider.Repositories;
 
 namespace SmartCart.DataProvider.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     public class CartMemberController : ControllerBase
     {
@@ -16,6 +15,7 @@ namespace SmartCart.DataProvider.Controllers
             _cartMemberRepository = cartMemberRepository;
         }
 
+        [Authorize]
         [HttpGet("retrieve")]
         public async Task<List<CartMemberDto>> Retrieve()
         {
@@ -23,6 +23,7 @@ namespace SmartCart.DataProvider.Controllers
             return cartMembers;
         }
 
+        [Authorize]
         [HttpGet("getById/{cartMemberId}")]
         public async Task<List<CartMemberDto>> RetrieveByIdAsync(Guid cartMemberId)
         {
@@ -30,6 +31,7 @@ namespace SmartCart.DataProvider.Controllers
             return cartMembers;
         }
 
+        [Authorize]
         [HttpGet("getByCartId/{cartId}")]
         public async Task<List<CartMemberDto>> RetrieveByCartIDAsync(Guid cartId)
         {
@@ -37,6 +39,7 @@ namespace SmartCart.DataProvider.Controllers
             return cartMembers;
         }
 
+        [Authorize]
         [HttpGet("getByUserId/{userId}")]
         public async Task<List<CartMemberDto>> RetrieveByUserIDAsync(Guid userId)
         {
@@ -44,6 +47,7 @@ namespace SmartCart.DataProvider.Controllers
             return cartMembers;
         }
 
+        [Authorize]
         [HttpPost("add")]
         public async Task<bool> AddAsync([FromBody] CartMemberDto cartMember)
         {
@@ -51,6 +55,7 @@ namespace SmartCart.DataProvider.Controllers
             return result;
         }
 
+        [Authorize]
         [HttpPost("addMultiple")]
         public async Task<bool> AddAsync([FromBody] List<CartMemberDto> cartMembers)
         {
@@ -58,6 +63,7 @@ namespace SmartCart.DataProvider.Controllers
             return result;
         }
 
+        [Authorize]
         [HttpPut("update")]
         public async Task<bool> UpdateAsync([FromBody] CartMemberDto cartMember)
         {
@@ -65,6 +71,7 @@ namespace SmartCart.DataProvider.Controllers
             return result;
         }
 
+        [Authorize]
         [HttpPut("updateMultiple")]
         public async Task<bool> UpdateAsync([FromBody] List<CartMemberDto> cartMemberDtos)
         {
@@ -72,6 +79,7 @@ namespace SmartCart.DataProvider.Controllers
             return result;
         }
 
+        [Authorize]
         [HttpDelete("delete/{cartMemberId}")]
         public async Task<bool> DeleteAsync(Guid cartMemberId)
         {
@@ -79,6 +87,7 @@ namespace SmartCart.DataProvider.Controllers
             return result;
         }
 
+        [Authorize]
         [HttpDelete("deleteByMemberAndCart/{memberId}/{cartID}")]
         public async Task<bool> DeleteAsyncByMemberAndCart(Guid memberId, Guid cartID)
         {

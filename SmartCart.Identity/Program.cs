@@ -26,6 +26,8 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Your API", Version = "v1" });
 });
 
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
