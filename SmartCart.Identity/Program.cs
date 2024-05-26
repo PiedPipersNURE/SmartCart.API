@@ -1,7 +1,24 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.EntityFrameworkCore;
+using SmartCart.Identity;
+using SmartCart.Identity.DatabaseContext;
+using SmartCart.Identity.Mapper;
+using SmartCart.Identity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+var defaultConnectionString = builder.Configuration.GetConnectionString("DbConnectionString");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(defaultConnectionString);
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -17,6 +34,16 @@ builder.Services.AddAuthentication(options =>
     options.CallbackPath = "/signin-google";
     options.SaveTokens = true;
 });
+
+
+#region Configurating DI
+SD.Issuer = builder.Configuration["Jwt:Issuer"];
+SD.JWTKey = builder.Configuration["Jwt:Key"];
+SD.Audience = builder.Configuration["Audience"];
+
+builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
+
+#endregion
 
 builder.Services.AddControllersWithViews();
 

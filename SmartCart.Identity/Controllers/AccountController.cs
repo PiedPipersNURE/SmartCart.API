@@ -1,24 +1,28 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Newtonsoft.Json.Linq;
+using SmartCart.Identity;
+using SmartCart.Identity.Models;
+using SmartCart.Identity.Repository;
+using SmartCart.Identity.Services;
 
 [Route("account")]
 public class AccountController : Controller
 {
-    private readonly IConfiguration _configuration;
-
-    public AccountController(IConfiguration configuration)
+    private readonly ITokenGeneratingService _tokenGeneratingService;
+    private readonly IUserRepository _userRepository;
+    
+    public AccountController(ITokenGeneratingService tokenGeneratingService, IUserRepository userRepository)
     {
-        _configuration = configuration;
+        _tokenGeneratingService = tokenGeneratingService;
+        _userRepository = userRepository;
     }
 
-    [HttpGet("login")]
+    [HttpGet("google-login")]
     public IActionResult Login(string returnUrl = "/")
     {
         var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse", new { returnUrl }) };
@@ -31,39 +35,70 @@ public class AccountController : Controller
         var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         if (!authenticateResult.Succeeded)
+        {
             return BadRequest();
+        }
 
         var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
 
         var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync($"https://www.googleapis.com/oauth2/v1/userinfo?access_token={accessToken}");
+        var response = await httpClient.GetAsync($"{SD.GoogleAPIEndpointURL}{accessToken}");
 
         if (!response.IsSuccessStatusCode)
+        {
             return BadRequest();
+        }
 
         var userInfoJson = await response.Content.ReadAsStringAsync();
         var userInfo = JsonConvert.DeserializeObject<dynamic>(userInfoJson);
 
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Email, userInfo.email.ToString()),
-            new Claim(ClaimTypes.Name, userInfo.name.ToString())
-        };
+        var user = await _userRepository.Get(userInfo.GoogleId.ToString());
+        string? jwtToken;
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        if (user != null)
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7),
-            Audience = _configuration["Audience"],
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _configuration["Jwt:Issuer"]
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-        var token = handler.CreateToken(tokenDescriptor);
-        var jwtToken = handler.WriteToken(token);
+            jwtToken = _tokenGeneratingService.GenerateToken(userInfo);
+        }
+        else
+        {
+            jwtToken = _tokenGeneratingService.GenerateToken(user);
+        }
 
         return Ok(jwtToken);
+    }
+
+    [HttpGet("login")]
+    public async Task<IActionResult> Login(LoginModel loginModel)
+    {
+        var user = await _userRepository.Login(loginModel);
+        if(user == null)
+        {
+            return NotFound();
+        }
+
+        var jwtToken = _tokenGeneratingService.GenerateToken(user);
+        return Ok(jwtToken);
+    }
+
+    [HttpPost("registration")]
+    public async Task<ActionResult> Registration(RegistrationModel registrationModel)
+    {
+        var result = await _userRepository.Insert(registrationModel);
+        if(result != null)
+        {
+            var jwtToken = _tokenGeneratingService.GenerateToken(result);
+            return Ok(jwtToken);
+        }
+
+        return BadRequest();
+    }
+
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateUser(UserDto userDto)
+    {
+        var result = await _userRepository.Update(userDto);
+
+        return result ? Ok() : BadRequest();
     }
 
     [HttpGet("logout")]
