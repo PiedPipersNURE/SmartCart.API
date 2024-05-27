@@ -1,20 +1,19 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartCart.DataProvider.Models;
 using SmartCart.DataProvider.Repositories;
 
 namespace SmartCart.DataProvider.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
-        private readonly IMapper _mapper;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper)
+        public ProductController(IProductRepository productRepository)
         {
             _productRepository = productRepository;
-            _mapper = mapper;
         }
 
         [HttpGet("getAll")]
