@@ -12,9 +12,9 @@ namespace SmartCart.Identity.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                new Claim("UserID", user.UserID.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim("Fullname", user.FullName ?? ""),
                 new Claim("BirthDate", user.BirthDate?.ToString("yyyy-MM-dd") ?? ""),
                 new Claim("Username", user.Username),
                 new Claim("IsNotificationEnabled", user.IsNotificationEnabled.ToString())
@@ -36,13 +36,9 @@ namespace SmartCart.Identity.Services
             return jwtToken;
         }
 
-        public string? GenerateToken(dynamic userInfo)
+        public string? GenerateToken(List<Claim> userInfo)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, userInfo.email.ToString()),
-                new Claim(ClaimTypes.Name, userInfo.name.ToString())
-            };
+            var claims = userInfo.Where(x => x.Type == ClaimTypes.Email || x.Type == ClaimTypes.Name);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

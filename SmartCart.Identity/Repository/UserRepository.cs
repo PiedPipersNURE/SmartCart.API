@@ -41,23 +41,26 @@ namespace SmartCart.Identity.Repository
             return null;
         }
 
-        public async Task<UserDto> Insert(RegistrationModel registrationModel)
+        public async Task<UserDto> Insert(RegistrationModel registrationModel, bool IsGoogleRegistration = false)
         {
             if (registrationModel != null)
             {
                 var userEntity = new User()
                 {
+                    GoogleID = registrationModel.GoogleID,
                     Username = registrationModel.Username,
                     Email = registrationModel.Email,
                     FullName = registrationModel.Fullname,
                     BirthDate = registrationModel.Birthdate,
                 };
 
-                var hashedPassword = PasswordHasher.HashPassword(registrationModel.Password);
+                if(!IsGoogleRegistration)
+                {
+                    var hashedPassword = PasswordHasher.HashPassword(registrationModel.Password);
 
-                userEntity.PasswordHash = hashedPassword.hash;
-                userEntity.PasswordSalt = hashedPassword.salt;
-
+                    userEntity.PasswordHash = hashedPassword.hash;
+                    userEntity.PasswordSalt = hashedPassword.salt;
+                }
                 await _context.Users.AddAsync(userEntity);
                 var result = await _context.SaveChangesAsync();
                 return result > 0 ? _mapper.Map<UserDto>(userEntity) : null;

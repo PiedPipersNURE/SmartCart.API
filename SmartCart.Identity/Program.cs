@@ -6,6 +6,10 @@ using SmartCart.Identity;
 using SmartCart.Identity.DatabaseContext;
 using SmartCart.Identity.Mapper;
 using SmartCart.Identity.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
+using SmartCart.Identity.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +45,8 @@ SD.Issuer = builder.Configuration["Jwt:Issuer"];
 SD.JWTKey = builder.Configuration["Jwt:Key"];
 SD.Audience = builder.Configuration["Audience"];
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
-
 #endregion
 
 builder.Services.AddControllersWithViews();
@@ -50,8 +54,8 @@ builder.Services.AddControllersWithViews();
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Your API", Version = "v1" });
-});
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    });
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

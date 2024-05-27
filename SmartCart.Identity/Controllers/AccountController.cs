@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SmartCart.Identity;
 using SmartCart.Identity.Models;
 using SmartCart.Identity.Repository;
 using SmartCart.Identity.Services;
+using System.Security.Claims;
 
 [Route("account")]
 public class AccountController : Controller
@@ -23,7 +20,7 @@ public class AccountController : Controller
     }
 
     [HttpGet("google-login")]
-    public IActionResult Login(string returnUrl = "/")
+    public IActionResult GoogleLogin(string returnUrl = "/")
     {
         var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse", new { returnUrl }) };
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
@@ -39,30 +36,27 @@ public class AccountController : Controller
             return BadRequest();
         }
 
-        var accessToken = authenticateResult.Properties.GetTokenValue("access_token");
+        var claims = authenticateResult.Principal.Claims.ToList();
 
-        var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync($"{SD.GoogleAPIEndpointURL}{accessToken}");
+        var googleId = claims.Where(x => x.Type.ToString() == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
 
-        if (!response.IsSuccessStatusCode)
-        {
-            return BadRequest();
-        }
-
-        var userInfoJson = await response.Content.ReadAsStringAsync();
-        var userInfo = JsonConvert.DeserializeObject<dynamic>(userInfoJson);
-
-        var user = await _userRepository.Get(userInfo.GoogleId.ToString());
+        var user = await _userRepository.Get(googleId);
         string? jwtToken;
 
-        if (user != null)
+        if (user == null)
         {
-            jwtToken = _tokenGeneratingService.GenerateToken(userInfo);
+            var registrationModel = new RegistrationModel
+            {
+                GoogleID = googleId,
+                Email = claims.Where(x => x.Type.ToString() == ClaimTypes.Email).FirstOrDefault().Value,
+                Username = claims.Where(x => x.Type.ToString() == ClaimTypes.Name).FirstOrDefault().Value,
+                Birthdate = new DateTime(2000,1,1),
+            };
+
+            user = await _userRepository.Insert(registrationModel, IsGoogleRegistration: true);
         }
-        else
-        {
-            jwtToken = _tokenGeneratingService.GenerateToken(user);
-        }
+
+        jwtToken = _tokenGeneratingService.GenerateToken(user);
 
         return Ok(jwtToken);
     }
