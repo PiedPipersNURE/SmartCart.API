@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SmartCart.DataProvider.DatabaseContext;
 using SmartCart.DataProvider.Models;
@@ -16,31 +17,49 @@ namespace SmartCart.DataProvider.Repositories
             _mapper = mapper;
         }
 
-        public async Task<bool> AddAsync(CartMemberDto cartMember)
+        public async Task<bool> AddAsync(CartMemberPost cartMemberPost)
         {
-            if (cartMember == null)
+            if (cartMemberPost == null || string.IsNullOrEmpty(cartMemberPost.UserMail))
             {
                 return false;
             }
 
-            var cartMemberEntity = _mapper.Map<CartMember>(cartMember);
+            string userId = string.Empty;
 
-            await _context.CartMembers.AddAsync(cartMemberEntity);
-            var result = await _context.SaveChangesAsync();
-            
-            return result > 0;
-        }
+            var commandText = "SELECT TOP 1 UserID FROM [dbo].[Users] WHERE Email = @Email";
+            var emailParameter = new SqlParameter("@Email", cartMemberPost.UserMail);
 
-        public async Task<bool> AddAsync(List<CartMemberDto> cartMembers)
-        {
-            if (cartMembers == null)
+            var connection = _context.Database.GetDbConnection();
+            await connection.OpenAsync();
+
+            using (var command = connection.CreateCommand())
             {
-                return false;
+                command.CommandText = commandText;
+                command.Parameters.Add(emailParameter);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        userId = reader["UserID"].ToString();
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
 
-            var cartMemberEntities = _mapper.Map<List<CartMember>>(cartMembers);
+            var userIdGuid = new Guid(userId);
 
-            _context.CartMembers.AddRange(cartMemberEntities);
+            var cartMember = new CartMember
+            {
+                CartID = cartMemberPost.CartID,
+                MemberID = userIdGuid
+            };
+
+            await _context.CartMembers.AddAsync(cartMember);
+
             var result = await _context.SaveChangesAsync();
 
             return result > 0;
