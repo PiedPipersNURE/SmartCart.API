@@ -44,19 +44,13 @@ namespace SmartCart.DataProvider.Controllers
             return cartMembers;
         }
 
-        [HttpPost("add")]
-        public async Task<bool> AddAsync([FromBody] CartMemberDto cartMember)
+        [HttpPost("addByGmail")]
+        public async Task<bool> AddAsync([FromBody] CartMemberPost cartMemberPost)
         {
-            var result = await _cartMemberRepository.AddAsync(cartMember);
+            var result = await _cartMemberRepository.AddAsync(cartMemberPost);
             return result;
         }
 
-        [HttpPost("addMultiple")]
-        public async Task<bool> AddAsync([FromBody] List<CartMemberDto> cartMembers)
-        {
-            var result = await _cartMemberRepository.AddAsync(cartMembers);
-            return result;
-        }
 
         [HttpPut("update")]
         public async Task<bool> UpdateAsync([FromBody] CartMemberDto cartMember)

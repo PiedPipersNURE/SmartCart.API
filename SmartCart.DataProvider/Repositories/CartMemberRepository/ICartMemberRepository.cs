@@ -8,8 +8,7 @@ namespace SmartCart.DataProvider.Repositories
         Task<List<CartMemberDto>> RetrieveByIdAsync(Guid cartMemberId);
         Task<List<CartMemberDto>> RetrieveByCartIDAsync(Guid cartId);
         Task<List<CartMemberDto>> RetrieveByUserIDAsync(Guid cartMemberId);
-        Task<bool> AddAsync(CartMemberDto cartMember);
-        Task<bool> AddAsync(List<CartMemberDto> cartMembers);
+        Task<bool> AddAsync(CartMemberPost cartMemberPost);
         Task<bool> UpdateAsync(CartMemberDto cartMember);
         Task<bool> UpdateAsync(List<CartMemberDto> cartMemberDtos);
         Task<bool> DeleteAsync(Guid cartMemberId);
