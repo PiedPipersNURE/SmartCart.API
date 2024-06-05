@@ -44,6 +44,13 @@ namespace SmartCart.DataProvider.Controllers
             return products;
         }
 
+        [HttpGet("getByUserId/{userId}")]
+        public async Task<List<ProductDto>> GetProductByName(Guid userId)
+        {
+            var products = await _productRepository.RetrieveByUserAsync(userId);
+            return products;
+        }
+
         [HttpPost("add")]
         public async Task<bool> AddProduct([FromBody] ProductDto product)
         {
