@@ -50,7 +50,6 @@ public class AccountController : Controller
                 GoogleID = googleId,
                 Email = claims.Where(x => x.Type.ToString() == ClaimTypes.Email).FirstOrDefault().Value,
                 Username = claims.Where(x => x.Type.ToString() == ClaimTypes.Name).FirstOrDefault().Value,
-                Birthdate = new DateTime(2000,1,1),
             };
 
             user = await _userRepository.Insert(registrationModel, IsGoogleRegistration: true);
