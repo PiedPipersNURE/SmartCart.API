@@ -89,6 +89,13 @@ namespace SmartCart.DataProvider.Repositories
             return _mapper.Map<List<ProductDto>>(products);
         }
 
+        public async Task<List<ProductDto>> RetrieveByUserAsync(Guid UserID)
+        {
+            var products = _context.Products.Where(p => p.BuyerID == UserID).ToList();
+
+            return _mapper.Map<List<ProductDto>>(products);
+        }
+
         public async Task<bool> UpdateAsync(ProductDto product)
         {
             if(product == null)
