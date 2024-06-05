@@ -74,9 +74,9 @@ public class AccountController : Controller
     }
 
     [HttpPost("registration")]
-    public async Task<ActionResult> Registration(RegistrationModel registrationModel, bool isGoogleAuth = false)
+    public async Task<ActionResult> Registration(RegistrationModel registrationModel)
     {
-        var result = await _userRepository.Insert(registrationModel, isGoogleAuth);
+        var result = await _userRepository.Insert(registrationModel);
         if(result != null)
         {
             var jwtToken = _tokenGeneratingService.GenerateToken(result);
@@ -87,18 +87,27 @@ public class AccountController : Controller
     }
 
     [HttpGet("google-mobile-login")]
-    public async Task<IActionResult> GoogleMobileLogin(string googleId)
+    public async Task<IActionResult> GoogleMobileLogin(RegistrationModel registrationModel)
     {
-        if (!string.IsNullOrEmpty(googleId))
+        if (registrationModel == null)
         {
             return BadRequest();
         }
 
-        var result = await _userRepository.Get(googleId);
+        var result = await _userRepository.Get(registrationModel.GoogleID);
         if (result != null)
         {
             var jwtToken = _tokenGeneratingService.GenerateToken(result);
             return Ok(jwtToken);
+        }
+        else
+        {
+            var user = await _userRepository.Insert(registrationModel, IsGoogleRegistration: true);
+            if (user != null)
+            {
+                var jwtToken = _tokenGeneratingService.GenerateToken(user);
+                return Ok(jwtToken);
+            }
         }
 
         return NotFound();
