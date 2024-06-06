@@ -60,9 +60,15 @@ public class AccountController : Controller
         return Ok(jwtToken);
     }
 
-    [HttpGet("login")]
-    public async Task<IActionResult> Login(LoginModel loginModel)
+    [HttpGet("login/{email}/{password}")]
+    public async Task<IActionResult> Login(string email, string password)
     {
+        var loginModel = new LoginModel
+        {
+            Email = email,
+            Password = password
+        };
+
         var user = await _userRepository.Login(loginModel);
         if(user == null)
         {
@@ -74,7 +80,7 @@ public class AccountController : Controller
     }
 
     [HttpPost("registration")]
-    public async Task<ActionResult> Registration(RegistrationModel registrationModel)
+    public async Task<ActionResult> Registration([FromBody]RegistrationModel registrationModel)
     {
         var result = await _userRepository.Insert(registrationModel);
         if(result != null)
@@ -86,15 +92,15 @@ public class AccountController : Controller
         return BadRequest();
     }
 
-    [HttpGet("google-mobile-login")]
-    public async Task<IActionResult> GoogleMobileLogin(RegistrationModel registrationModel)
+    [HttpGet("google-mobile-login/{googleId}/{username}/{email}")]
+    public async Task<IActionResult> GoogleMobileLogin(string googleId, string username, string email)
     {
-        if (registrationModel == null)
+        if (string.IsNullOrEmpty(googleId) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email))
         {
             return BadRequest();
         }
 
-        var result = await _userRepository.Get(registrationModel.GoogleID);
+        var result = await _userRepository.Get(googleId);
         if (result != null)
         {
             var jwtToken = _tokenGeneratingService.GenerateToken(result);
@@ -102,6 +108,13 @@ public class AccountController : Controller
         }
         else
         {
+            var registrationModel = new RegistrationModel
+            {
+                GoogleID = googleId,
+                Email = email,
+                Username = username,
+            };
+
             var user = await _userRepository.Insert(registrationModel, IsGoogleRegistration: true);
             if (user != null)
             {
