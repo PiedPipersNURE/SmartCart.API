@@ -7,7 +7,7 @@ namespace SmartCart.DataProvider.Repositories
         Task<List<ProductDto>> Retrieve();
         Task<ProductDto> RetrieveByIdAsync(Guid productId);
         Task<List<ProductDto>> RetrieveByNameAsync(string name);
-        Task<List<ProductDto>> RetrieveByCartAndUserAsync(Guid cartID, Guid UserID);
+        Task<List<ProductDto>> RetrieveByCartAsync(Guid cartID);
         Task<List<ProductDto>> RetrieveByUserAsync(Guid UserID);
         Task<bool> AddAsync(ProductDto product);
         Task<bool> AddAsync(List<ProductDto> products);

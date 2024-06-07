@@ -25,7 +25,9 @@ namespace SmartCart.Identity.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Audience = SD.Audience,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SD.JWTKey)), SecurityAlgorithms.HmacSha256Signature),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SD.JWTKey)),
+                    SecurityAlgorithms.HmacSha256Signature),
                 Issuer = SD.Issuer
             };
 
@@ -38,7 +40,9 @@ namespace SmartCart.Identity.Services
 
         public string? GenerateToken(List<Claim> userInfo)
         {
-            var claims = userInfo.Where(x => x.Type == ClaimTypes.Email || x.Type == ClaimTypes.Name);
+            var claims = userInfo.Where(x => 
+                x.Type == ClaimTypes.Email || 
+                x.Type == ClaimTypes.Name);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

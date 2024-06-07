@@ -30,10 +30,10 @@ namespace SmartCart.DataProvider.Controllers
             return product;
         }
 
-        [HttpGet("getByCartAndUser/{cartID}/{userID}")]
-        public async Task<List<ProductDto>> GetProductByCartAndUser(Guid cartID, Guid userID)
+        [HttpGet("getByCart/{cartID}")]
+        public async Task<List<ProductDto>> GetProductByCartAndUser(Guid cartID)
         {
-            var products = await _productRepository.RetrieveByCartAndUserAsync(cartID, userID);
+            var products = await _productRepository.RetrieveByCartAsync(cartID);
             return products;
         }
 

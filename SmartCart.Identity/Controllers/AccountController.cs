@@ -74,7 +74,7 @@ public class AccountController : Controller
     }
 
     [HttpPost("registration")]
-    public async Task<ActionResult> Registration(RegistrationModel registrationModel)
+    public async Task<ActionResult> Registration([FromBody]RegistrationModel registrationModel)
     {
         var result = await _userRepository.Insert(registrationModel);
         if(result != null)
@@ -126,5 +126,17 @@ public class AccountController : Controller
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
+    }
+    
+    [HttpGet("get-username-by-id/{userId}")]
+    public async Task<IActionResult> GetUsernameById(string userId)
+    {
+        var user = await _userRepository.Get(new Guid(userId));
+        if(user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user.Username);
     }
 }
